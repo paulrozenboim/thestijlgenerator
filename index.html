@@ -158,26 +158,8 @@
 
         // Mobile-specific optimizations
         function setupMobileOptimizations() {
-            // Remove the touch prevention code that was blocking scrolling
+            // Remove all touch prevention - let p5.js and our explicit handlers manage it
             
-            // Keep only the double-tap zoom prevention (optional)
-            let lastTouchEnd = 0;
-            document.addEventListener('touchend', function (event) {
-                const now = (new Date()).getTime();
-                if (now - lastTouchEnd <= 300) {
-                    // Only prevent double-tap zoom on canvas area
-                    const canvasArea = document.getElementById('canvasArea');
-                    const touch = event.changedTouches[0];
-                    const rect = canvasArea.getBoundingClientRect();
-                    
-                    if (touch.clientX >= rect.left && touch.clientX <= rect.right && 
-                        touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-                        event.preventDefault();
-                    }
-                }
-                lastTouchEnd = now;
-            }, false);
-
             // Optimize for high DPI screens
             if (window.devicePixelRatio > 1) {
                 console.log("High DPI detected:", window.devicePixelRatio);
@@ -388,6 +370,57 @@
         function mouseReleased() {
             if (currentSketch === 5 && typeof createPatternRect === 'function') createPatternRect();
             if (currentSketch === 7 && typeof endColorBurst === 'function') endColorBurst();
+        }
+
+        // Touch event handlers for mobile support
+        function touchStarted() {
+            // Map touch to mouse coordinates
+            if (touches.length > 0) {
+                // Only handle single touch for canvas interactions (ignore multi-touch for sketch 10)
+                if (currentSketch !== 10 || touches.length === 1) {
+                    // Check if touch is within canvas bounds
+                    if (touches[0].x >= 0 && touches[0].x <= width && touches[0].y >= 0 && touches[0].y <= height) {
+                        // Manually trigger mousePressed for canvas interactions
+                        mousePressed();
+                        
+                        // Prevent default only for canvas area
+                        return false;
+                    }
+                }
+            }
+        }
+
+        function touchMoved() {
+            // Handle single touch drag interactions
+            if (touches.length === 1) {
+                // Check if touch is within canvas bounds
+                if (touches[0].x >= 0 && touches[0].x <= width && touches[0].y >= 0 && touches[0].y <= height) {
+                    // Manually trigger mouseDragged for canvas interactions
+                    mouseDragged();
+                    
+                    // Prevent default scrolling when interacting with canvas
+                    return false;
+                }
+            }
+            // For sketch 10, let the sketch handle multi-touch
+            else if (currentSketch === 10 && touches.length === 2) {
+                // Let sketch 10's touchMoved handle the pinch gesture
+                return;
+            }
+        }
+
+        function touchEnded() {
+            // Check if this was a canvas interaction
+            if (changedTouches.length > 0) {
+                let touch = changedTouches[0];
+                if (touch.x >= 0 && touch.x <= width && touch.y >= 0 && touch.y <= height) {
+                    // Manually trigger mouseReleased for canvas interactions
+                    mouseReleased();
+                    
+                    // Prevent default for canvas area
+                    return false;
+                }
+            }
         }
 
         // Fix mouse wheel for sketch 10
