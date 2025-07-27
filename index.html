@@ -156,16 +156,6 @@
             console.log("Canvas:", canvasWidth, "x", canvasHeight);
         }
 
-        // Mobile-specific optimizations
-        function setupMobileOptimizations() {
-            // Remove all touch prevention - let p5.js and our explicit handlers manage it
-            
-            // Optimize for high DPI screens
-            if (window.devicePixelRatio > 1) {
-                console.log("High DPI detected:", window.devicePixelRatio);
-            }
-        }
-
         // Update canvas size based on fullscreen state
         let canvasWidth, canvasHeight;
         function updateCanvasSize() {
@@ -173,27 +163,17 @@
                 canvasWidth = window.innerWidth;
                 canvasHeight = window.innerHeight;
             } else {
-                // Mobile-first responsive sizing
+                // Simplified sizing for mobile
                 const isMobile = window.innerWidth <= 768;
                 
                 if (isMobile) {
-                    // On mobile, maximize available space
-                    const titleHeight = document.getElementById('mainTitle').offsetHeight || 60;
-                    const controlsHeight = document.getElementById('controls').offsetHeight || 50;
-                    const sketchInfoHeight = document.getElementById('sketchInfo').offsetHeight || 50;
-                    const footerHeight = document.querySelector('footer').offsetHeight || 30;
-                    const margins = 40; // Total margins and padding
-                    
-                    canvasWidth = window.innerWidth - 20; // Small margin
-                    canvasHeight = window.innerHeight - titleHeight - controlsHeight - sketchInfoHeight - footerHeight - margins;
-                    
-                    // Ensure minimum size
-                    canvasWidth = Math.max(canvasWidth, 280);
-                    canvasHeight = Math.max(canvasHeight, 200);
+                    // Simple mobile sizing
+                    canvasWidth = window.innerWidth - 30; // Account for margins
+                    canvasHeight = Math.max(300, window.innerHeight * 0.5); // At least 300px high
                 } else {
                     // Desktop sizing
                     canvasWidth = Math.min(window.innerWidth - 100, 900);
-                    canvasHeight = Math.min(window.innerHeight - 400, 600);
+                    canvasHeight = Math.min(window.innerHeight - 300, 600);
                 }
             }
         }
@@ -372,54 +352,14 @@
             if (currentSketch === 7 && typeof endColorBurst === 'function') endColorBurst();
         }
 
-        // Touch event handlers for mobile support
-        function touchStarted() {
-            // Map touch to mouse coordinates
-            if (touches.length > 0) {
-                // Only handle single touch for canvas interactions (ignore multi-touch for sketch 10)
-                if (currentSketch !== 10 || touches.length === 1) {
-                    // Check if touch is within canvas bounds
-                    if (touches[0].x >= 0 && touches[0].x <= width && touches[0].y >= 0 && touches[0].y <= height) {
-                        // Manually trigger mousePressed for canvas interactions
-                        mousePressed();
-                        
-                        // Prevent default only for canvas area
-                        return false;
-                    }
-                }
-            }
-        }
-
-        function touchMoved() {
-            // Handle single touch drag interactions
-            if (touches.length === 1) {
-                // Check if touch is within canvas bounds
-                if (touches[0].x >= 0 && touches[0].x <= width && touches[0].y >= 0 && touches[0].y <= height) {
-                    // Manually trigger mouseDragged for canvas interactions
-                    mouseDragged();
-                    
-                    // Prevent default scrolling when interacting with canvas
-                    return false;
-                }
-            }
-            // For sketch 10, let the sketch handle multi-touch
-            else if (currentSketch === 10 && touches.length === 2) {
-                // Let sketch 10's touchMoved handle the pinch gesture
-                return;
-            }
-        }
-
-        function touchEnded() {
-            // Check if this was a canvas interaction
-            if (changedTouches.length > 0) {
-                let touch = changedTouches[0];
-                if (touch.x >= 0 && touch.x <= width && touch.y >= 0 && touch.y <= height) {
-                    // Manually trigger mouseReleased for canvas interactions
-                    mouseReleased();
-                    
-                    // Prevent default for canvas area
-                    return false;
-                }
+        // Mobile-specific optimizations - Simplified
+        function setupMobileOptimizations() {
+            // Simple mobile setup without blocking interactions
+            console.log("Mobile optimizations enabled");
+            
+            // Optimize for high DPI screens
+            if (window.devicePixelRatio > 1) {
+                console.log("High DPI detected:", window.devicePixelRatio);
             }
         }
 
