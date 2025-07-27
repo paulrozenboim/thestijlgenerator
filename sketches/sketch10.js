@@ -47,8 +47,72 @@ function redrawLetterMosaic() {
     });
 }
 
+// Mouse wheel for desktop
 function mouseWheel(event) {
-    cellSize += event.delta > 0 ? -5 : 5;
-    cellSize = constrain(cellSize, 10, 100);
-    return false; // prevents default scroll
+    if (currentSketch === 10 && mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+        cellSize += event.delta > 0 ? -5 : 5;
+        cellSize = constrain(cellSize, 10, 100);
+        return false; // prevents default scroll
+    }
+}
+
+// Touch gesture variables for mobile pinch/zoom
+let initialPinchDistance = 0;
+let lastPinchDistance = 0;
+let isPinching = false;
+
+// Touch start - detect two finger pinch
+function touchStarted() {
+    if (currentSketch === 10 && touches.length === 2) {
+        // Calculate initial distance between two fingers
+        let touch1 = touches[0];
+        let touch2 = touches[1];
+        initialPinchDistance = dist(touch1.x, touch1.y, touch2.x, touch2.y);
+        lastPinchDistance = initialPinchDistance;
+        isPinching = true;
+        
+        // Prevent default browser zoom
+        return false;
+    }
+}
+
+// Touch moved - track pinch distance changes
+function touchMoved() {
+    if (currentSketch === 10 && touches.length === 2 && isPinching) {
+        let touch1 = touches[0];
+        let touch2 = touches[1];
+        let currentPinchDistance = dist(touch1.x, touch1.y, touch2.x, touch2.y);
+        
+        // Calculate change in distance
+        let distanceChange = currentPinchDistance - lastPinchDistance;
+        
+        // Map distance change to cell size change (similar sensitivity to mouse wheel)
+        if (abs(distanceChange) > 2) { // Threshold to avoid jittery changes
+            if (distanceChange > 0) {
+                // Pinch out (zoom in) - increase cell size
+                cellSize += 3;
+            } else {
+                // Pinch in (zoom out) - decrease cell size
+                cellSize -= 3;
+            }
+            
+            cellSize = constrain(cellSize, 10, 100);
+            lastPinchDistance = currentPinchDistance;
+            
+            // Redraw existing grids with new cell size
+            redrawLetterMosaic();
+        }
+        
+        // Prevent default browser zoom
+        return false;
+    }
+}
+
+// Touch ended - reset pinch state
+function touchEnded() {
+    if (currentSketch === 10 && touches.length < 2) {
+        isPinching = false;
+        initialPinchDistance = 0;
+        lastPinchDistance = 0;
+    }
 }

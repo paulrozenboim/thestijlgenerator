@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>The Stilj Generator</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -12,21 +12,23 @@
         
         <div id="controls">
             <select id="sketchSelect" onchange="loadSketch()">
-                <option value="1">Sketch 1 - Basic Shape Drawing</option>
-                <option value="2">Sketch 2 - Letter Typography Explorer</option>
-                <option value="3">Sketch 3 - Mondrian Collage</option>
-                <option value="4">Sketch 4 - Magnetic Letter Field</option>
-                <option value="5">Sketch 5 - Dynamic Pattern Rectangles</option>
-                <option value="6">Sketch 6 - Zero Gravity Type</option>
-                <option value="7">Sketch 7 - Generative Color Burst</option>
-                <option value="8">Sketch 8 - Letter Gravity Field</option>
-                <option value="9">Sketch 9 - Shape Trails</option>
-                <option value="10">Sketch 10 - Mondrian Pixels</option>
+                <option value="1">Basic Shape Drawing</option>
+                <option value="2">Letter Typography Explorer</option>
+                <option value="3">Mondrian Collage</option>
+                <option value="4">Magnetic Letter Field</option>
+                <option value="5">Dynamic Pattern Rectangles</option>
+                <option value="6">Zero Gravity Type</option>
+                <option value="7">Generative Color Burst</option>
+                <option value="8">Letter Gravity Field</option>
+                <option value="9">Shape Trails</option>
+                <option value="10">Mondrian Pixels</option>
             </select>
             
-            <button onclick="clearCanvas()" title="Clear">🧽</button>
-            <button onclick="saveCanvasImage()" title="Save PNG (Press S)">💾</button>
-            <button onclick="toggleFullscreen()" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+            <div class="button-row">
+                <button onclick="clearCanvas()" title="Clear">🧽</button>
+                <button onclick="saveCanvasImage()" title="Save PNG (Press S)">💾</button>
+                <button onclick="toggleFullscreen()" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+            </div>
         </div>
 
         <div id="sketchInfo">
@@ -148,7 +150,44 @@
             canvas.parent("canvasArea");
             background("#FFFFFF");
             
+            // Mobile optimizations
+            setupMobileOptimizations();
+            
             console.log("Canvas:", canvasWidth, "x", canvasHeight);
+        }
+
+        // Mobile-specific optimizations
+        function setupMobileOptimizations() {
+            // Prevent scrolling on mobile
+            document.body.addEventListener('touchmove', function(e) {
+                // Only prevent if not in fullscreen and touch is outside canvas
+                if (!isFullscreen) {
+                    const canvasArea = document.getElementById('canvasArea');
+                    const touch = e.touches[0];
+                    const rect = canvasArea.getBoundingClientRect();
+                    
+                    // If touch is outside canvas area, prevent default
+                    if (touch.clientX < rect.left || touch.clientX > rect.right || 
+                        touch.clientY < rect.top || touch.clientY > rect.bottom) {
+                        e.preventDefault();
+                    }
+                }
+            }, { passive: false });
+
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+
+            // Optimize for high DPI screens
+            if (window.devicePixelRatio > 1) {
+                console.log("High DPI detected:", window.devicePixelRatio);
+            }
         }
 
         // Update canvas size based on fullscreen state
@@ -158,8 +197,28 @@
                 canvasWidth = window.innerWidth;
                 canvasHeight = window.innerHeight;
             } else {
-                canvasWidth = Math.min(window.innerWidth - 100, 900);
-                canvasHeight = Math.min(window.innerHeight - 400, 600);
+                // Mobile-first responsive sizing
+                const isMobile = window.innerWidth <= 768;
+                
+                if (isMobile) {
+                    // On mobile, maximize available space
+                    const titleHeight = document.getElementById('mainTitle').offsetHeight || 60;
+                    const controlsHeight = document.getElementById('controls').offsetHeight || 50;
+                    const sketchInfoHeight = document.getElementById('sketchInfo').offsetHeight || 50;
+                    const footerHeight = document.querySelector('footer').offsetHeight || 30;
+                    const margins = 40; // Total margins and padding
+                    
+                    canvasWidth = window.innerWidth - 20; // Small margin
+                    canvasHeight = window.innerHeight - titleHeight - controlsHeight - sketchInfoHeight - footerHeight - margins;
+                    
+                    // Ensure minimum size
+                    canvasWidth = Math.max(canvasWidth, 280);
+                    canvasHeight = Math.max(canvasHeight, 200);
+                } else {
+                    // Desktop sizing
+                    canvasWidth = Math.min(window.innerWidth - 100, 900);
+                    canvasHeight = Math.min(window.innerHeight - 400, 600);
+                }
             }
         }
 
@@ -179,7 +238,7 @@
                 }
                 
                 isFullscreen = true;
-                fullscreenBtn.textContent = "⛶"; // Change to filled square when in fullscreen
+                // Keep same icon since user won't see it in fullscreen
                 fullscreenBtn.title = "Exit Fullscreen";
                 
                 // Update canvas size for fullscreen
@@ -200,7 +259,7 @@
                 }
                 
                 isFullscreen = false;
-                fullscreenBtn.textContent = "⛶"; // Change back to empty square
+                // Icon stays the same
                 fullscreenBtn.title = "Toggle Fullscreen";
                 
                 // Update canvas size for normal view
@@ -221,7 +280,7 @@
             if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
                 // Exited fullscreen
                 isFullscreen = false;
-                document.getElementById('fullscreenBtn').textContent = "⬜";
+                // Icon stays the same
                 document.getElementById('fullscreenBtn').title = "Toggle Fullscreen";
                 
                 setTimeout(() => {
@@ -348,14 +407,28 @@
             }
         }
 
-        // Simple resize
+        // Improved resize handling for mobile
         function windowResized() {
             if (!isFullscreen) {
-                updateCanvasSize();
-                resizeCanvas(canvasWidth, canvasHeight);
-                background("#FFFFFF");
+                // Debounce resize on mobile for better performance
+                clearTimeout(window.resizeTimer);
+                window.resizeTimer = setTimeout(() => {
+                    updateCanvasSize();
+                    resizeCanvas(canvasWidth, canvasHeight);
+                    background("#FFFFFF");
+                    console.log("Canvas resized:", canvasWidth, "x", canvasHeight);
+                }, 100);
             }
         }
+
+        // Handle orientation change on mobile
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                if (!isFullscreen) {
+                    windowResized();
+                }
+            }, 300); // Wait for orientation change to complete
+        });
 
         // Load sketch
         function loadSketch() {
