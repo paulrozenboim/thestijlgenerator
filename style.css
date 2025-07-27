@@ -1,0 +1,308 @@
+/* Reset and Base Styles */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Verdana, sans-serif;
+    text-align: center;
+    background: #f5f5f5;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Main content wrapper */
+.main-content {
+    flex: 1;
+}
+
+/* Typography - Consolidated h1 styles */
+h1 {
+    font-size: 50px;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #000;
+    cursor: pointer;
+    line-height: 1.2;
+}
+
+h1 span {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    margin: 0 1px;
+}
+
+h1:hover span {
+    transform: scale(1.05) !important;
+}
+
+/* Layout Components */
+#controls {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#canvasArea {
+    background: #000;
+    padding: 10px;
+    margin: 20px auto;
+    display: inline-block;
+    border-radius: 2px;
+}
+
+#sketchInfo {
+    margin: 15px auto;
+    max-width: 600px;
+    padding: 0 20px;
+}
+
+#sketchTitle {
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: #000;
+}
+
+#sketchDescription {
+    font-size: 14px;
+    color: #333;
+}
+
+/* Interactive Elements */
+select, button {
+    padding: 10px 15px;
+    margin: 0 5px;
+    font-size: 16px;
+    border: 2px solid #000;
+    background: white;
+    cursor: pointer;
+    font-family: Verdana, sans-serif;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+/* Emoji buttons styling */
+button {
+    padding: 10px 15px;
+    margin: 0 5px;
+    font-size: 18px; /* Slightly larger for emojis */
+    border: 2px solid #000;
+    background: white;
+    cursor: pointer;
+    font-family: Verdana, sans-serif;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+    min-width: 45px; /* Ensure emoji buttons have consistent width */
+    height: 45px; /* Consistent height */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Special styling for emoji-only buttons */
+button:has-only-emoji,
+button[title*="Save"],
+button[title*="Fullscreen"] {
+    font-size: 20px;
+    padding: 8px;
+}
+
+/* Rest of your existing button styles... */
+button:hover {
+    background: #fac901;
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+select:focus, button:focus {
+    outline: 2px solid #fac901;
+    outline-offset: 2px;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+    padding: 15px 20px;
+    background: #000;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+footer a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+footer a:hover {
+    color: #fac901;
+}
+
+/* Canvas Responsiveness */
+canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Fullscreen canvas area */
+#canvasArea:fullscreen {
+    background: #000;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+#canvasArea:-webkit-full-screen {
+    background: #000;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+#canvasArea:-moz-full-screen {
+    background: #000;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Responsive Design - No font-size overrides needed */
+@media (max-width: 768px) {
+    #controls {
+        flex-direction: column;
+        gap: 15px;
+        margin: 15px 0;
+    }
+    
+    select, button {
+        width: 200px;
+        padding: 12px 15px;
+    }
+    
+    #canvasArea {
+        margin: 15px 10px;
+        padding: 8px;
+    }
+    
+    #sketchInfo {
+        padding: 0 15px;
+        margin: 10px auto;
+    }
+    
+    footer {
+        padding: 12px 15px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 36px; /* Only reduce on very small screens */
+    }
+    
+    select, button {
+        width: 90%;
+        max-width: 280px;
+    }
+    
+    #canvasArea {
+        margin: 10px 5px;
+        padding: 5px;
+    }
+    
+    #sketchInfo {
+        padding: 0 10px;
+    }
+    
+    #sketchTitle {
+        font-size: 16px;
+    }
+    
+    #sketchDescription {
+        font-size: 13px;
+    }
+    
+    footer {
+        padding: 10px;
+        font-size: 10px;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Print Styles */
+@media print {
+    footer {
+        display: none;
+    }
+    
+    #controls {
+        display: none;
+    }
+    
+    body {
+        background: white;
+    }
+    
+    #canvasArea {
+        background: white;
+        padding: 0;
+    }
+}
+
+/* Responsive adjustments for emoji buttons */
+@media (max-width: 768px) {
+    button {
+        font-size: 20px;
+        min-width: 50px;
+        height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    button {
+        font-size: 18px;
+        min-width: 45px;
+        height: 45px;
+    }
+}

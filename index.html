@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Stilj Generator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-content">
+        <h1 id="mainTitle">The Stilj Generator</h1>
+        
+        <div id="controls">
+            <select id="sketchSelect" onchange="loadSketch()">
+                <option value="1">Sketch 1 - Basic Shape Drawing</option>
+                <option value="2">Sketch 2 - Letter Typography Explorer</option>
+                <option value="3">Sketch 3 - Mondrian Collage</option>
+                <option value="4">Sketch 4 - Magnetic Letter Field</option>
+                <option value="5">Sketch 5 - Dynamic Pattern Rectangles</option>
+                <option value="6">Sketch 6 - Zero Gravity Type</option>
+                <option value="7">Sketch 7 - Generative Color Burst</option>
+                <option value="8">Sketch 8 - Letter Gravity Field</option>
+                <option value="9">Sketch 9 - Shape Trails</option>
+                <option value="10">Sketch 10 - Mondrian Pixels</option>
+            </select>
+            
+            <button onclick="clearCanvas()" title="Clear">🧽</button>
+            <button onclick="saveCanvasImage()" title="Save PNG (Press S)">💾</button>
+            <button onclick="toggleFullscreen()" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+        </div>
+
+        <div id="sketchInfo">
+            <div id="sketchTitle">Basic Shape Drawing</div>
+            <div id="sketchDescription">Click to draw basic shapes with Mondrian colors</div>
+        </div>
+
+        <div id="canvasArea">
+            <!-- p5.js canvas goes here -->
+        </div>
+    </div>
+
+    <footer>
+        <div><a href="http://www.unapaulogetic.art/">by @unapaulogetic</a></div>
+    </footer>
+
+    <script src="lib/p5.js"></script>
+    
+    <!-- Load sketch files -->
+    <script src="sketches/sketch1.js"></script>
+    <script src="sketches/sketch2.js"></script>
+    <script src="sketches/sketch3.js"></script>
+    <script src="sketches/sketch4.js"></script>
+    <script src="sketches/sketch5.js"></script>
+    <script src="sketches/sketch6.js"></script>
+    <script src="sketches/sketch7.js"></script>
+    <script src="sketches/sketch8.js"></script>
+    <script src="sketches/sketch9.js"></script>
+    <script src="sketches/sketch10.js"></script>
+    
+    <script>
+        // Fonts and colors for title
+        const titleFonts = ["Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans", "Arial Black", "Impact"];
+        const mondrianColors = ["#FEB400", "#155498", "#018C34", "#D5311F", "#000000", "#FFFFFF"];
+        
+        // Style each letter individually
+        function styleIndividualLetters() {
+            const titleElement = document.getElementById('mainTitle');
+            const titleText = "The Stilj Generator";
+            
+            // Clear the title and build it letter by letter
+            titleElement.innerHTML = '';
+            
+            for (let i = 0; i < titleText.length; i++) {
+                const char = titleText[i];
+                const span = document.createElement('span');
+                span.textContent = char;
+                
+                // Skip styling for spaces
+                if (char !== ' ') {
+                    // Random font
+                    const randomFont = titleFonts[Math.floor(Math.random() * titleFonts.length)];
+                    
+                    // Random Mondrian color (excluding white for better visibility)
+                    const colorsWithoutWhite = mondrianColors.filter(color => color !== "#FFFFFF");
+                    const randomColor = colorsWithoutWhite[Math.floor(Math.random() * colorsWithoutWhite.length)];
+                    
+                    // Apply styles
+                    span.style.fontFamily = randomFont;
+                    span.style.color = randomColor;
+                    span.style.webkitTextStroke = '1pt #000000';
+                    span.style.textStroke = '1pt #000000';
+                    span.style.display = 'inline-block';
+                    
+                    // Optional: Add slight random rotation for more chaos
+                    const randomRotation = (Math.random() - 0.5) * 10;
+                    span.style.transform = `rotate(${randomRotation}deg)`;
+                } else {
+                    // For spaces, just add some width
+                    span.style.display = 'inline-block';
+                    span.style.width = '0.3em';
+                }
+                
+                titleElement.appendChild(span);
+            }
+            
+            console.log("Title letters styled individually!");
+        }
+        
+        // Call it when page loads
+        styleIndividualLetters();
+
+        // Optional: Click title to re-randomize
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('mainTitle').addEventListener('click', styleIndividualLetters);
+        });
+
+        // Simple global variables
+        let currentSketch = 1;
+        let canvas;
+        let letters = [];
+        let shapes = [];
+        let lettersList = [];
+        let startX = 0, startY = 0;
+        let isDrawing = false;
+        let fonts = ["Arial", "Helvetica", "Verdana", "Tahoma", "Trebuchet MS", "Gill Sans", "Arial Black", "Impact"];
+        let isFullscreen = false;
+
+        const MONDRIAN_COLORS = ["#FEB400", "#155498", "#018C34", "#D5311F", "#000000", "#FFFFFF"];
+        
+        const sketchData = {
+            1: { title: "Basic Shape Drawing", description: "Click to draw basic shapes with Mondrian colors" },
+            2: { title: "Letter Typography Explorer", description: "Click to place letters with random fonts and styles" },
+            3: { title: "Mondrian Collage", description: "Drag to create grid-snapping rectangles with Mondrian colors" },
+            4: { title: "Magnetic Letter Field", description: "Drag to create floating letters attracted to your mouse" },
+            5: { title: "Dynamic Pattern Rectangles", description: "Drag to create textured rectangles with varied patterns" },
+            6: { title: "Zero Gravity Type", description: "Drag to create bouncing, spinning letters with physics" },
+            7: { title: "Generative Color Burst", description: "Press and hold to grow lines, release for burst effect" },
+            8: { title: "Letter Gravity Field", description: "Drag to create letters that fall and bounce with gravity" },
+            9: { title: "Shape Trails", description: "Drag to leave a trail of shapes cycling through types" },
+            10: { title: "Mondrian Pixels", description: "Drag to place pixels, use scroll wheel to adjust cell size" }
+        };
+
+        // Simple canvas setup
+        function setup() {
+            updateCanvasSize();
+            
+            canvas = createCanvas(canvasWidth, canvasHeight);
+            canvas.parent("canvasArea");
+            background("#FFFFFF");
+            
+            console.log("Canvas:", canvasWidth, "x", canvasHeight);
+        }
+
+        // Update canvas size based on fullscreen state
+        let canvasWidth, canvasHeight;
+        function updateCanvasSize() {
+            if (isFullscreen) {
+                canvasWidth = window.innerWidth;
+                canvasHeight = window.innerHeight;
+            } else {
+                canvasWidth = Math.min(window.innerWidth - 100, 900);
+                canvasHeight = Math.min(window.innerHeight - 400, 600);
+            }
+        }
+
+        // Fullscreen functionality
+        function toggleFullscreen() {
+            const canvasArea = document.getElementById('canvasArea');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            
+            if (!isFullscreen) {
+                // Enter fullscreen
+                if (canvasArea.requestFullscreen) {
+                    canvasArea.requestFullscreen();
+                } else if (canvasArea.webkitRequestFullscreen) {
+                    canvasArea.webkitRequestFullscreen();
+                } else if (canvasArea.msRequestFullscreen) {
+                    canvasArea.msRequestFullscreen();
+                }
+                
+                isFullscreen = true;
+                fullscreenBtn.textContent = "⛶"; // Change to filled square when in fullscreen
+                fullscreenBtn.title = "Exit Fullscreen";
+                
+                // Update canvas size for fullscreen
+                setTimeout(() => {
+                    updateCanvasSize();
+                    resizeCanvas(canvasWidth, canvasHeight);
+                    background("#FFFFFF");
+                }, 100);
+                
+            } else {
+                // Exit fullscreen
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                
+                isFullscreen = false;
+                fullscreenBtn.textContent = "⛶"; // Change back to empty square
+                fullscreenBtn.title = "Toggle Fullscreen";
+                
+                // Update canvas size for normal view
+                setTimeout(() => {
+                    updateCanvasSize();
+                    resizeCanvas(canvasWidth, canvasHeight);
+                    background("#FFFFFF");
+                }, 100);
+            }
+        }
+
+        // Listen for fullscreen changes
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('msfullscreenchange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                // Exited fullscreen
+                isFullscreen = false;
+                document.getElementById('fullscreenBtn').textContent = "⬜";
+                document.getElementById('fullscreenBtn').title = "Toggle Fullscreen";
+                
+                setTimeout(() => {
+                    updateCanvasSize();
+                    resizeCanvas(canvasWidth, canvasHeight);
+                    background("#FFFFFF");
+                }, 100);
+            }
+        }
+
+        // Keyboard functionality - Save with 'S' key
+        document.addEventListener('keydown', function(event) {
+            // Check if 'S' key is pressed (case insensitive)
+            if (event.key.toLowerCase() === 's' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+                // Prevent default browser behavior
+                event.preventDefault();
+                
+                // Save canvas image
+                saveCanvasImage();
+                
+                // Visual feedback
+                console.log("Screenshot saved!");
+                
+                // Optional: Show brief visual confirmation
+                showSaveConfirmation();
+            }
+        });
+
+        // Show save confirmation
+        function showSaveConfirmation() {
+            // Create temporary notification
+            const notification = document.createElement('div');
+            notification.textContent = '💾 Screenshot Saved!';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #fac901;
+                color: #000;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-family: Verdana, sans-serif;
+                font-weight: bold;
+                z-index: 1000;
+                animation: fadeInOut 2s ease-in-out;
+            `;
+            
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOut {
+                    0% { opacity: 0; transform: translateY(-20px); }
+                    20% { opacity: 1; transform: translateY(0); }
+                    80% { opacity: 1; transform: translateY(0); }
+                    100% { opacity: 0; transform: translateY(-20px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after animation
+            setTimeout(() => {
+                document.body.removeChild(notification);
+                document.head.removeChild(style);
+            }, 2000);
+        }
+
+        // Simple draw loop
+        function draw() {
+            switch(currentSketch) {
+                case 2: if (typeof drawLetterTypography === 'function') drawLetterTypography(); break;
+                case 4: if (typeof drawMagneticLetters === 'function') drawMagneticLetters(); break;
+                case 5: 
+                    if (isDrawing) background("#FFFFFF");
+                    if (typeof redrawPatternGrid === 'function') redrawPatternGrid();
+                    if (typeof drawDragPreview === 'function') drawDragPreview();
+                    break;
+                case 6: if (typeof drawKineticLetters === 'function') drawKineticLetters(); break;
+                case 7: if (typeof drawColorBurst === 'function') drawColorBurst(); break;
+                case 8: if (typeof drawLetterGravity === 'function') drawLetterGravity(); break;
+                case 9: if (typeof drawShapeTrails === 'function') drawShapeTrails(); break;
+            }
+        }
+
+        // Mouse events
+        function mousePressed() {
+            if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height) return;
+            
+            switch(currentSketch) {
+                case 1: if (typeof drawBasicShape === 'function') drawBasicShape(); break;
+                case 2: if (typeof clickLetterTypography === 'function') clickLetterTypography(); break;
+                case 5: if (typeof startPatternRect === 'function') startPatternRect(); break;
+                case 7: if (typeof startColorBurst === 'function') startColorBurst(); break;
+            }
+        }
+
+        function mouseDragged() {
+            if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height) return;
+            
+            switch(currentSketch) {
+                case 3: if (typeof createMondrianCollage === 'function') createMondrianCollage(); break;
+                case 4: if (typeof createMagneticLetter === 'function') createMagneticLetter(); break;
+                case 6: if (typeof createKineticLetter === 'function') createKineticLetter(); break;
+                case 8: if (typeof createGravityLetter === 'function') createGravityLetter(); break;
+                case 9: if (typeof createShapeTrail === 'function') createShapeTrail(); break;
+                case 10: if (typeof placeLetterMosaic === 'function') placeLetterMosaic(); break;
+            }
+        }
+
+        function mouseReleased() {
+            if (currentSketch === 5 && typeof createPatternRect === 'function') createPatternRect();
+            if (currentSketch === 7 && typeof endColorBurst === 'function') endColorBurst();
+        }
+
+        // Fix mouse wheel for sketch 10
+        function mouseWheel(event) {
+            if (currentSketch === 10 && mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+                if (typeof cellSize !== 'undefined') {
+                    cellSize += event.delta > 0 ? -5 : 5;
+                    cellSize = constrain(cellSize, 10, 100);
+                }
+                return false; // Prevent page scroll
+            }
+        }
+
+        // Simple resize
+        function windowResized() {
+            if (!isFullscreen) {
+                updateCanvasSize();
+                resizeCanvas(canvasWidth, canvasHeight);
+                background("#FFFFFF");
+            }
+        }
+
+        // Load sketch
+        function loadSketch() {
+            currentSketch = parseInt(document.getElementById('sketchSelect').value);
+            
+            let data = sketchData[currentSketch];
+            document.getElementById('sketchTitle').textContent = data.title;
+            document.getElementById('sketchDescription').textContent = data.description;
+            
+            background("#FFFFFF");
+            
+            // Reset everything
+            letters = [];
+            shapes = [];
+            lettersList = [];
+            startX = 0; startY = 0;
+            isDrawing = false;
+            
+            // Initialize sketch
+            const initFunc = `initializeSketch${currentSketch}`;
+            if (typeof window[initFunc] === 'function') {
+                window[initFunc]();
+            }
+        }
+
+        // Utility functions
+        function clearCanvas() {
+            background("#FFFFFF");
+            letters = []; shapes = []; lettersList = [];
+            startX = 0; startY = 0; isDrawing = false;
+        }
+
+        function saveCanvasImage() {
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            saveCanvas(`stilj-generator-sketch${currentSketch}-${timestamp}`, "png");
+        }
+    </script>
+</body>
+</html> 

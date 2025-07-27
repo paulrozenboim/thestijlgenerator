@@ -1,0 +1,118 @@
+// Variables to track mouse velocity
+let prevMouseX = 0;
+let prevMouseY = 0;
+let mouseVelocity = 0;
+
+function initializeSketch9() {
+    shapes = [];
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
+    mouseVelocity = 0;
+    console.log("Sketch 9 initialized: Shape Trails with Rotation");
+}
+
+function createShapeTrail() {
+    // Calculate mouse velocity
+    let currentVelX = mouseX - prevMouseX;
+    let currentVelY = mouseY - prevMouseY;
+    mouseVelocity = sqrt(currentVelX * currentVelX + currentVelY * currentVelY);
+    
+    // Update previous mouse position
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
+    
+    let shape = {
+        x: mouseX,
+        y: mouseY,
+        color: random(MONDRIAN_COLORS),
+        size: random(40, 100),
+        created: millis(),
+        type: shapes.length % 5,
+        rotation: 0, // Current rotation angle
+        rotationSpeed: map(mouseVelocity, 0, 50, 0.02, 0.3), // Rotation speed based on drag speed
+        direction: random([-1, 1]) // Random clockwise or counterclockwise
+    };
+    shapes.push(shape);
+}
+
+function drawShapeTrails() {
+    background("#FFFFFF"); // clear canvas each frame
+
+    let now = millis();
+    for (let i = shapes.length - 1; i >= 0; i--) {
+        let s = shapes[i];
+        let age = now - s.created;
+        let life = 5000; // ms
+        let t = 1 - age / life;
+
+        if (t <= 0) {
+            shapes.splice(i, 1);
+            continue;
+        }
+
+        // Update rotation based on speed and time
+        s.rotation += s.rotationSpeed * s.direction;
+
+        let currentSize = s.size * t;
+        
+        // Apply rotation and translation
+        push();
+        translate(s.x, s.y);
+        rotate(s.rotation);
+
+        fill(s.color);
+        stroke("#000000");
+        strokeWeight(2);
+
+        switch (s.type) {
+            case 0: // Rectangle
+                rectMode(CENTER);
+                rect(0, 0, currentSize, currentSize);
+                break;
+                
+            case 1: // Circle (rotation doesn't affect appearance, but we'll add a line to show it)
+                ellipse(0, 0, currentSize, currentSize);
+                // Add a line to show rotation
+                stroke("#000000");
+                strokeWeight(3);
+                line(0, 0, currentSize / 3, 0);
+                break;
+                
+            case 2: // Triangle
+                triangle(
+                    0, -currentSize / 2,
+                    -currentSize / 2, currentSize / 2,
+                    currentSize / 2, currentSize / 2
+                );
+                break;
+                
+            case 3: // Hexagon
+                beginShape();
+                for (let j = 0; j < 6; j++) {
+                    let angle = TWO_PI / 6 * j;
+                    vertex(cos(angle) * currentSize / 2, sin(angle) * currentSize / 2);
+                }
+                endShape(CLOSE);
+                break;
+                
+            case 4: // Line (extended to show rotation better)
+                strokeWeight(4);
+                line(-currentSize / 2, 0, currentSize / 2, 0);
+                // Add perpendicular line to show rotation better
+                strokeWeight(2);
+                line(0, -currentSize / 4, 0, currentSize / 4);
+                break;
+        }
+        
+        pop(); // Restore transformation matrix
+    }
+}
+
+// Update mouse velocity tracking when not dragging
+function mouseMoved() {
+    if (currentSketch === 9) {
+        prevMouseX = mouseX;
+        prevMouseY = mouseY;
+        mouseVelocity = 0; // Reset velocity when not dragging
+    }
+}
