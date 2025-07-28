@@ -8,6 +8,13 @@ function initializeSketch7() {
     console.log("Sketch 7 initialized: Generative Color Burst");
 }
 
+// Add a clear function specifically for sketch 7
+function clearSketch7() {
+    liveBurst = null;
+    bursts = [];
+    background("#FFFFFF");
+}
+
 // Remove the separate mousePressed/mouseReleased functions and create functions that app.html can call
 function startColorBurst() {
     const originX = mouseX;

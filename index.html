@@ -422,6 +422,11 @@
             background("#FFFFFF");
             letters = []; shapes = []; lettersList = [];
             startX = 0; startY = 0; isDrawing = false;
+            
+            // Clear sketch-specific data
+            if (currentSketch === 7 && typeof clearSketch7 === 'function') {
+                clearSketch7();
+            }
         }
 
         function saveCanvasImage() {
