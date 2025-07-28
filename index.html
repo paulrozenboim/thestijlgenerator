@@ -322,9 +322,12 @@
             }
         }
 
-        // Mouse events
+        // Mouse events - Simplified bounds checking for mobile
         function mousePressed() {
-            if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height) return;
+            // More lenient bounds checking for mobile touch
+            if (mouseX < -10 || mouseX > width + 10 || mouseY < -10 || mouseY > height + 10) return;
+            
+            console.log("Mouse pressed at:", mouseX, mouseY, "Canvas size:", width, height);
             
             switch(currentSketch) {
                 case 1: if (typeof drawBasicShape === 'function') drawBasicShape(); break;
@@ -335,7 +338,8 @@
         }
 
         function mouseDragged() {
-            if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height) return;
+            // More lenient bounds checking for mobile touch
+            if (mouseX < -10 || mouseX > width + 10 || mouseY < -10 || mouseY > height + 10) return;
             
             switch(currentSketch) {
                 case 3: if (typeof createMondrianCollage === 'function') createMondrianCollage(); break;
@@ -350,32 +354,63 @@
         function mouseReleased() {
             if (currentSketch === 5 && typeof createPatternRect === 'function') createPatternRect();
             if (currentSketch === 7 && typeof endColorBurst === 'function') endColorBurst();
-            if (currentSketch === 10 && typeof endLetterMosaic === 'function') endLetterMosaic();
-            function touchStarted() { return mousePressed(); }
-            function touchMoved() { return mouseDragged(); }
-            function touchEnded() { return mouseReleased(); }
-            function touchMoved() {
-  if (touches.length === 2) {
-    // Example: detect pinch distance
-    let d = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
-    console.log("Pinch distance:", d);
-  } else {
-    mouseDragged();
-  }
-  return false;
-}
-
         }
 
-        // Mobile-specific optimizations - Simplified
+        // Global touch event handlers for mobile
+        function touchStarted() {
+            console.log("Touch started, touches:", touches.length, "sketch:", currentSketch);
+            
+            // Let p5.js automatically map touch to mouse events
+            // Only handle special cases for sketch 10 pinch
+            if (currentSketch === 10 && touches.length === 2) {
+                console.log("Sketch 10 pinch detected");
+                return false; // Let sketch 10 handle pinch gestures
+            }
+            
+            // For all other cases, p5.js will automatically call mousePressed()
+            console.log("Letting p5.js handle touch as mouse event");
+        }
+
+        function touchMoved() {
+            // Handle sketch 10 pinch gestures
+            if (currentSketch === 10 && touches.length === 2) {
+                return false; // Let sketch 10 handle pinch gestures
+            }
+            // For single touch, p5.js will automatically call mouseDragged()
+        }
+
+        function touchEnded() {
+            console.log("Touch ended");
+            
+            // Let p5.js automatically map touch to mouse events
+            // Only handle special cases for sketch 10
+            if (currentSketch === 10) {
+                return false;
+            }
+            // For all other cases, p5.js will automatically call mouseReleased()
+        }
+
+        // Mobile-specific optimizations - Enhanced
         function setupMobileOptimizations() {
-            // Simple mobile setup without blocking interactions
-            console.log("Mobile optimizations enabled");
+            console.log("Setting up mobile optimizations...");
+            
+            // Check if we're on a mobile device
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            console.log("Mobile detected:", isMobile);
             
             // Optimize for high DPI screens
             if (window.devicePixelRatio > 1) {
                 console.log("High DPI detected:", window.devicePixelRatio);
             }
+            
+            // Ensure canvas has proper touch settings
+            const canvas = document.querySelector('canvas');
+            if (canvas) {
+                canvas.style.touchAction = 'none';
+                console.log("Canvas touch settings applied");
+            }
+            
+            console.log("Mobile optimizations complete");
         }
 
         // Fix mouse wheel for sketch 10

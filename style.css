@@ -7,11 +7,8 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
-}
-
-body, html {
     overscroll-behavior: none; /* Prevent bounce/scroll */
-  }
+}
 
 body {
     font-family: Verdana, sans-serif;
@@ -191,8 +188,7 @@ canvas {
     box-sizing: border-box !important;
     background: transparent !important;
     /* Mobile touch optimization */
-    touch-action: none; /* Allow canvas to handle all touch events */
-    touch-action: none;       /* Disable scroll/pinch zoom */
+    touch-action: none !important; /* Allow canvas to handle all touch events */
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
