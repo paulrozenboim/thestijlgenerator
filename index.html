@@ -28,6 +28,7 @@
                 <button onclick="clearCanvas()" title="Clear">🧽</button>
                 <button onclick="saveCanvasImage()" title="Save PNG (Press S)">💾</button>
                 <button onclick="toggleFullscreen()" id="fullscreenBtn" title="Toggle Fullscreen">⛶</button>
+                <button onclick="testDraw()" title="Test Draw">🎨</button>
             </div>
         </div>
 
@@ -142,18 +143,31 @@
             10: { title: "Mondrian Pixels", description: "Drag to place pixels, use scroll wheel to adjust cell size" }
         };
 
-        // Simple canvas setup
+        // Simple canvas setup with enhanced debugging
         function setup() {
+            console.log("🚀 p5.js setup() starting...");
+            
             updateCanvasSize();
+            console.log("Canvas dimensions calculated:", canvasWidth, "x", canvasHeight);
             
             canvas = createCanvas(canvasWidth, canvasHeight);
+            console.log("Canvas created");
+            
             canvas.parent("canvasArea");
+            console.log("Canvas attached to canvasArea");
+            
             background("#FFFFFF");
+            console.log("Background set to white");
             
             // Mobile optimizations
             setupMobileOptimizations();
             
-            console.log("Canvas:", canvasWidth, "x", canvasHeight);
+            // Test if we can draw immediately
+            fill('green');
+            circle(50, 50, 30);
+            console.log("✅ Green test circle drawn at (50,50)");
+            
+            console.log("🎉 Setup complete! Canvas:", canvasWidth, "x", canvasHeight);
         }
 
         // Update canvas size based on fullscreen state
@@ -322,18 +336,36 @@
             }
         }
 
-        // Mouse events - Simplified bounds checking for mobile
+        // Mouse events - Enhanced debugging for mobile
         function mousePressed() {
-            // More lenient bounds checking for mobile touch
-            if (mouseX < -10 || mouseX > width + 10 || mouseY < -10 || mouseY > height + 10) return;
+            console.log("🖱️ mousePressed() called");
+            console.log("Mouse position:", mouseX, mouseY);
+            console.log("Canvas size:", width, height);
+            console.log("Current sketch:", currentSketch);
             
-            console.log("Mouse pressed at:", mouseX, mouseY, "Canvas size:", width, height);
+            // More lenient bounds checking for mobile touch
+            if (mouseX < -10 || mouseX > width + 10 || mouseY < -10 || mouseY > height + 10) {
+                console.log("❌ Mouse outside bounds, ignoring");
+                return;
+            }
+            
+            console.log("✅ Mouse within bounds, processing sketch", currentSketch);
             
             switch(currentSketch) {
-                case 1: if (typeof drawBasicShape === 'function') drawBasicShape(); break;
+                case 1: 
+                    console.log("Calling drawBasicShape");
+                    if (typeof drawBasicShape === 'function') {
+                        drawBasicShape(); 
+                        console.log("✅ drawBasicShape called successfully");
+                    } else {
+                        console.log("❌ drawBasicShape function not found");
+                    }
+                    break;
                 case 2: if (typeof clickLetterTypography === 'function') clickLetterTypography(); break;
                 case 5: if (typeof startPatternRect === 'function') startPatternRect(); break;
                 case 7: if (typeof startColorBurst === 'function') startColorBurst(); break;
+                default:
+                    console.log("No action defined for sketch", currentSketch);
             }
         }
 
@@ -356,38 +388,48 @@
             if (currentSketch === 7 && typeof endColorBurst === 'function') endColorBurst();
         }
 
-        // Global touch event handlers for mobile
+        // Simplified touch handlers - Let p5.js handle it
         function touchStarted() {
-            console.log("Touch started, touches:", touches.length, "sketch:", currentSketch);
+            console.log("👆 Touch started, touches:", touches.length, "sketch:", currentSketch);
+            console.log("Touch position:", touches[0] ? touches[0].x + ", " + touches[0].y : "none");
             
-            // Let p5.js automatically map touch to mouse events
-            // Only handle special cases for sketch 10 pinch
-            if (currentSketch === 10 && touches.length === 2) {
-                console.log("Sketch 10 pinch detected");
-                return false; // Let sketch 10 handle pinch gestures
+            // Visual feedback - draw a red circle where touch occurred
+            if (touches.length === 1) {
+                fill('red');
+                noStroke();
+                circle(touches[0].x, touches[0].y, 20);
+                console.log("🔴 Drew red circle at touch position");
             }
             
-            // For all other cases, p5.js will automatically call mousePressed()
-            console.log("Letting p5.js handle touch as mouse event");
+            // Special case for sketch 10 pinch
+            if (currentSketch === 10 && touches.length === 2) {
+                console.log("Sketch 10 pinch - letting sketch handle");
+                return false;
+            }
+            
+            // For all other cases, let p5.js handle but don't prevent default
+            console.log("Letting p5.js handle touch event");
         }
 
         function touchMoved() {
-            // Handle sketch 10 pinch gestures
+            // Special case for sketch 10 pinch
             if (currentSketch === 10 && touches.length === 2) {
-                return false; // Let sketch 10 handle pinch gestures
+                return false;
             }
-            // For single touch, p5.js will automatically call mouseDragged()
+            
+            // For single touch, let p5.js handle but prevent page scroll
+            if (touches.length === 1) {
+                return false; // Prevent scrolling while dragging
+            }
         }
 
         function touchEnded() {
             console.log("Touch ended");
             
-            // Let p5.js automatically map touch to mouse events
-            // Only handle special cases for sketch 10
+            // Special case for sketch 10
             if (currentSketch === 10) {
                 return false;
             }
-            // For all other cases, p5.js will automatically call mouseReleased()
         }
 
         // Mobile-specific optimizations - Enhanced
@@ -481,6 +523,32 @@
         function saveCanvasImage() {
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             saveCanvas(`stilj-generator-sketch${currentSketch}-${timestamp}`, "png");
+        }
+
+        // Test function to verify drawing works without touch
+        function testDraw() {
+            console.log("🎨 Test draw button clicked");
+            console.log("Current sketch:", currentSketch);
+            
+            // Draw a test shape directly
+            console.log("Drawing test shape at canvas center");
+            
+            // Simple test shape
+            fill('blue');
+            stroke('black');
+            strokeWeight(3);
+            let testX = width/2;
+            let testY = height/2;
+            circle(testX, testY, 50);
+            
+            console.log("✅ Test blue circle drawn at center");
+            
+            // Also test if the sketch function exists
+            if (currentSketch === 1 && typeof drawBasicShape === 'function') {
+                console.log("✅ drawBasicShape function exists");
+            } else {
+                console.log("❌ drawBasicShape function missing or not sketch 1");
+            }
         }
     </script>
 </body>
