@@ -58,14 +58,13 @@ function drawShapeTrails() {
             continue;
         }
 
-        // Update rotation based on speed and time
+        // Update rotation
         s.rotation += s.rotationSpeed * s.direction;
 
-        let currentSize = s.size * t;
+        // 🔥 Pulse effect
         let pulse = sin((age / 200) * TWO_PI) * 0.2 + 1; 
-let currentSize = s.size * t * pulse;
-        
-        // Apply rotation and translation
+        let currentSize = s.size * t * pulse;
+
         push();
         translate(s.x, s.y);
         rotate(s.rotation);
@@ -75,28 +74,24 @@ let currentSize = s.size * t * pulse;
         strokeWeight(2);
 
         switch (s.type) {
-            case 0: // Rectangle
+            case 0:
                 rectMode(CENTER);
                 rect(0, 0, currentSize, currentSize);
                 break;
-                
-            case 1: // Circle (rotation doesn't affect appearance, but we'll add a line to show it)
+            case 1:
                 ellipse(0, 0, currentSize, currentSize);
-                // Add a line to show rotation
                 stroke("#000000");
                 strokeWeight(3);
                 line(0, 0, currentSize / 3, 0);
                 break;
-                
-            case 2: // Triangle
+            case 2:
                 triangle(
                     0, -currentSize / 2,
                     -currentSize / 2, currentSize / 2,
                     currentSize / 2, currentSize / 2
                 );
                 break;
-                
-            case 3: // Hexagon
+            case 3:
                 beginShape();
                 for (let j = 0; j < 6; j++) {
                     let angle = TWO_PI / 6 * j;
@@ -104,19 +99,18 @@ let currentSize = s.size * t * pulse;
                 }
                 endShape(CLOSE);
                 break;
-                
-            case 4: // Line (extended to show rotation better)
+            case 4:
                 strokeWeight(4);
                 line(-currentSize / 2, 0, currentSize / 2, 0);
-                // Add perpendicular line to show rotation better
                 strokeWeight(2);
                 line(0, -currentSize / 4, 0, currentSize / 4);
                 break;
         }
-        
-        pop(); // Restore transformation matrix
+
+        pop();
     }
 }
+
 
 // Update mouse velocity tracking when not dragging
 function mouseMoved() {
