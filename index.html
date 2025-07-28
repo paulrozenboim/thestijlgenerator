@@ -350,6 +350,9 @@
         function mouseReleased() {
             if (currentSketch === 5 && typeof createPatternRect === 'function') createPatternRect();
             if (currentSketch === 7 && typeof endColorBurst === 'function') endColorBurst();
+            function touchStarted() { return mousePressed(); }
+function touchMoved() { return mouseDragged(); }
+function touchEnded() { return mouseReleased(); }
         }
 
         // Mobile-specific optimizations - Simplified
