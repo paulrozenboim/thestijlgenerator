@@ -317,29 +317,6 @@ function redrawCurrentSketch() {
     }
 }
 
-function touchStarted() {
-    if (typeof mousePressed === 'function') mousePressed();
-    return false; // block scrolling
-  }
-  
-  function touchMoved() {
-    if (touches.length === 2) {
-      let d = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
-      console.log("Pinch distance:", d);
-      // put your zoom/scale logic here
-    } else if (typeof mouseDragged === 'function') {
-      mouseDragged();
-    }
-    return false;
-  }
-  
-  
-  function touchEnded() {
-    if (typeof mouseReleased === 'function') mouseReleased();
-    return false;
-  }
-  
-
 // Initialize when page loads
 window.addEventListener('DOMContentLoaded', function() {
     // p5.js will call setup() automatically
