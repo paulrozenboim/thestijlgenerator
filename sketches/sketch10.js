@@ -66,22 +66,25 @@ function mouseWheel(event) {
 
 // Touch handling for pinch gestures (only for sketch 10)
 function touchStarted() {
-    if (currentSketch !== 10 || touches.length < 2) return;
+    if (currentSketch !== 10) return true; // Let p5.js handle other sketches normally
     
     // Start pinch gesture with two fingers
     if (touches.length === 2) {
         initialPinchDistance = getTouchDistance(touches[0], touches[1]);
         initialCellSize = cellSize;
         isPinching = true;
-        return false; // Prevent default touch behavior
+        return false; // Prevent default touch behavior for pinch
     }
+    
+    // For single touch, let p5.js handle it normally (will become mouse events)
+    return true;
 }
 
 function touchMoved() {
-    if (currentSketch !== 10 || !isPinching || touches.length < 2) return;
+    if (currentSketch !== 10) return true; // Let p5.js handle other sketches normally
     
     // Handle pinch gesture
-    if (touches.length === 2) {
+    if (isPinching && touches.length === 2) {
         const currentDistance = getTouchDistance(touches[0], touches[1]);
         const distanceChange = currentDistance - initialPinchDistance;
         
@@ -93,12 +96,15 @@ function touchMoved() {
         // Redraw with new cell size
         redrawLetterMosaic();
         
-        return false; // Prevent default touch behavior
+        return false; // Prevent default touch behavior for pinch
     }
+    
+    // For single touch or non-pinch, let p5.js handle it normally
+    return true;
 }
 
 function touchEnded() {
-    if (currentSketch !== 10) return;
+    if (currentSketch !== 10) return true; // Let p5.js handle other sketches normally
     
     // End pinch gesture when we have less than 2 touches
     if (touches.length < 2) {
@@ -107,7 +113,8 @@ function touchEnded() {
         initialCellSize = 0;
     }
     
-    return false; // Prevent default touch behavior
+    // Always let p5.js handle touch end events
+    return true;
 }
 
 // Helper function to calculate distance between two touch points
