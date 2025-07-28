@@ -268,21 +268,34 @@
             }
         }
 
-        // Keyboard functionality - Save with 'S' key
+        // Keyboard functionality - Save with 'S' key, Clear with 'E', Fullscreen with 'F'
         document.addEventListener('keydown', function(event) {
-            // Check if 'S' key is pressed (case insensitive)
-            if (event.key.toLowerCase() === 's' && !event.ctrlKey && !event.metaKey && !event.altKey) {
-                // Prevent default browser behavior
-                event.preventDefault();
-                
-                // Save canvas image
-                saveCanvasImage();
-                
-                // Visual feedback
-                console.log("Screenshot saved!");
-                
-                // Optional: Show brief visual confirmation
-                showSaveConfirmation();
+            // Check if keys are pressed (case insensitive) without modifiers
+            if (!event.ctrlKey && !event.metaKey && !event.altKey) {
+                switch(event.key.toLowerCase()) {
+                    case 's':
+                        // Save canvas image
+                        event.preventDefault();
+                        saveCanvasImage();
+                        console.log("Screenshot saved!");
+                        showSaveConfirmation();
+                        break;
+                    
+                    case 'e':
+                        // Clear/Erase canvas
+                        event.preventDefault();
+                        clearCanvas();
+                        console.log("Canvas cleared!");
+                        showClearConfirmation();
+                        break;
+                    
+                    case 'f':
+                        // Toggle fullscreen
+                        event.preventDefault();
+                        toggleFullscreen();
+                        console.log("Fullscreen toggled!");
+                        break;
+                }
             }
         });
 
@@ -304,7 +317,36 @@
                 z-index: 1000;
                 animation: fadeInOut 2s ease-in-out;
             `;
+        
+                    // Show clear confirmation
+        function showClearConfirmation() {
+            // Create temporary notification
+            const notification = document.createElement('div');
+            notification.textContent = '🧽 Canvas Cleared!';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #018C34;
+                color: #fff;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-family: Verdana, sans-serif;
+                font-weight: bold;
+                z-index: 1000;
+                animation: fadeInOut 2s ease-in-out;
+            `;
             
+            document.body.appendChild(notification);
+            
+            // Remove notification after animation
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 2000);
+        }
+
             // Add CSS animation
             const style = document.createElement('style');
             style.textContent = `

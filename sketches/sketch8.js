@@ -7,6 +7,12 @@ function initializeSketch8() {
     console.log("Sketch 8 initialized: Letter Gravity Field");
 }
 
+// Add a clear function specifically for sketch 8
+function clearSketch8() {
+    gravityLetters = [];
+    background("#FFFFFF");
+}
+
 function createGravityLetter() {
     gravityLetters.push({
         char: random("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?".split("")),
