@@ -17,6 +17,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    overscroll-behavior: none; /* Prevent pull-to-refresh */
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Main content wrapper */
@@ -54,12 +56,25 @@ h1:hover span {
     flex-wrap: wrap;
 }
 
+/* Separate controls for mobile layout */
+.dropdown-row {
+    display: contents;
+}
+
+.buttons-row {
+    display: contents;
+}
+
 #canvasArea {
     background: #000;
     padding: 10px;
     margin: 20px auto;
     display: inline-block;
     border-radius: 2px;
+    touch-action: none; /* Prevent touch scrolling */
+    -webkit-touch-callout: none; /* Disable iOS callout */
+    -webkit-user-select: none; /* Disable text selection */
+    user-select: none;
 }
 
 #sketchInfo {
@@ -163,6 +178,10 @@ canvas {
     display: block;
     max-width: 100%;
     height: auto;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 /* Fullscreen canvas area */
@@ -202,28 +221,42 @@ canvas {
 /* Responsive Design - No font-size overrides needed */
 @media (max-width: 768px) {
     #controls {
-        gap: 8px;
+        gap: 10px;
         margin: 15px 0;
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .dropdown-row {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+    
+    .buttons-row {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
     }
     
     select {
         width: auto;
-        min-width: 180px;
-        padding: 10px 12px;
+        min-width: 200px;
+        padding: 12px 15px;
         font-size: 14px;
     }
     
     button {
-        padding: 10px 12px;
-        font-size: 16px;
-        min-width: 42px;
-        height: 42px;
+        padding: 12px 15px;
+        font-size: 18px;
+        min-width: 50px;
+        height: 50px;
     }
     
     #canvasArea {
-        margin: 15px 10px;
-        padding: 8px;
+        margin: 10px 5px;
+        padding: 5px;
     }
     
     #sketchInfo {
