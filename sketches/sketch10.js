@@ -1,20 +1,9 @@
 let mondrianGrids = [];
 let cellSize = 30;
 
-// Touch/pinch variables
-let initialPinchDistance = 0;
-let initialCellSize = 0;
-let isPinching = false;
-
 function initializeSketch10() {
     mondrianGrids = [];
     background("#FFFFFF");
-    
-    // Reset pinch variables
-    initialPinchDistance = 0;
-    initialCellSize = 0;
-    isPinching = false;
-    
     console.log("Sketch 10 initialized: Mondrian Pixels");
 }
 
@@ -62,57 +51,4 @@ function mouseWheel(event) {
     cellSize += event.delta > 0 ? -5 : 5;
     cellSize = constrain(cellSize, 10, 100);
     return false; // prevents default scroll
-}
-
-// Touch handling for pinch gestures (only for sketch 10)
-function touchStarted() {
-    if (currentSketch !== 10 || touches.length < 2) return;
-    
-    // Start pinch gesture with two fingers
-    if (touches.length === 2) {
-        initialPinchDistance = getTouchDistance(touches[0], touches[1]);
-        initialCellSize = cellSize;
-        isPinching = true;
-        return false; // Prevent default touch behavior
-    }
-}
-
-function touchMoved() {
-    if (currentSketch !== 10 || !isPinching || touches.length < 2) return;
-    
-    // Handle pinch gesture
-    if (touches.length === 2) {
-        const currentDistance = getTouchDistance(touches[0], touches[1]);
-        const distanceChange = currentDistance - initialPinchDistance;
-        
-        // Scale the distance change to reasonable cell size adjustments
-        const scaleFactor = distanceChange * 0.1;
-        cellSize = initialCellSize + scaleFactor;
-        cellSize = constrain(cellSize, 10, 100);
-        
-        // Redraw with new cell size
-        redrawLetterMosaic();
-        
-        return false; // Prevent default touch behavior
-    }
-}
-
-function touchEnded() {
-    if (currentSketch !== 10) return;
-    
-    // End pinch gesture when we have less than 2 touches
-    if (touches.length < 2) {
-        isPinching = false;
-        initialPinchDistance = 0;
-        initialCellSize = 0;
-    }
-    
-    return false; // Prevent default touch behavior
-}
-
-// Helper function to calculate distance between two touch points
-function getTouchDistance(touch1, touch2) {
-    const dx = touch1.x - touch2.x;
-    const dy = touch1.y - touch2.y;
-    return Math.sqrt(dx * dx + dy * dy);
 }
