@@ -350,9 +350,21 @@
         function mouseReleased() {
             if (currentSketch === 5 && typeof createPatternRect === 'function') createPatternRect();
             if (currentSketch === 7 && typeof endColorBurst === 'function') endColorBurst();
+            if (currentSketch === 10 && typeof endLetterMosaic === 'function') endLetterMosaic();
             function touchStarted() { return mousePressed(); }
-function touchMoved() { return mouseDragged(); }
-function touchEnded() { return mouseReleased(); }
+            function touchMoved() { return mouseDragged(); }
+            function touchEnded() { return mouseReleased(); }
+            function touchMoved() {
+  if (touches.length === 2) {
+    // Example: detect pinch distance
+    let d = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+    console.log("Pinch distance:", d);
+  } else {
+    mouseDragged();
+  }
+  return false;
+}
+
         }
 
         // Mobile-specific optimizations - Simplified

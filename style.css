@@ -9,6 +9,10 @@ html, body {
     padding: 0;
 }
 
+body, html {
+    overscroll-behavior: none; /* Prevent bounce/scroll */
+  }
+
 body {
     font-family: Verdana, sans-serif;
     text-align: center;
@@ -188,6 +192,10 @@ canvas {
     background: transparent !important;
     /* Mobile touch optimization */
     touch-action: none; /* Allow canvas to handle all touch events */
+    touch-action: none;       /* Disable scroll/pinch zoom */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Fullscreen canvas area */
