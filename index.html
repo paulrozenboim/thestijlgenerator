@@ -120,12 +120,20 @@
             // Prevent pull-to-refresh and overscroll behavior on mobile
             document.body.addEventListener('touchstart', function(e) {
                 if (e.target.closest('#canvasArea')) {
+                    // Allow pinch gestures for sketch 10
+                    if (currentSketch === 10 && e.touches.length === 2) {
+                        return;
+                    }
                     e.preventDefault();
                 }
             }, { passive: false });
             
             document.body.addEventListener('touchmove', function(e) {
                 if (e.target.closest('#canvasArea')) {
+                    // Allow pinch gestures for sketch 10
+                    if (currentSketch === 10 && e.touches.length === 2) {
+                        return;
+                    }
                     e.preventDefault();
                 }
             }, { passive: false });
@@ -154,7 +162,7 @@
             7: { title: "Generative Color Burst", description: "Press and hold to grow lines, release for burst effect" },
             8: { title: "Letter Gravity Field", description: "Drag to create letters that fall and bounce with gravity" },
             9: { title: "Shape Trails", description: "Drag to leave a trail of shapes cycling through types" },
-            10: { title: "Mondrian Pixels", description: "Drag to place pixels, use scroll wheel to adjust cell size" }
+            10: { title: "Mondrian Pixels", description: "Drag to place pixels, use scroll wheel or pinch to adjust cell size" }
         };
 
         // Simple canvas setup
@@ -168,14 +176,28 @@
             // Prevent touch scrolling and pull-to-refresh on canvas
             const canvasElement = canvas.canvas;
             canvasElement.addEventListener('touchstart', function(e) {
+                // Allow pinch gestures for sketch 10, but prevent other touch behaviors
+                if (currentSketch === 10 && e.touches.length === 2) {
+                    // Allow pinch gesture to proceed to p5.js touch handlers
+                    return;
+                }
                 e.preventDefault();
             }, { passive: false });
             
             canvasElement.addEventListener('touchmove', function(e) {
+                // Allow pinch gestures for sketch 10, but prevent other touch behaviors
+                if (currentSketch === 10 && e.touches.length === 2) {
+                    // Allow pinch gesture to proceed to p5.js touch handlers
+                    return;
+                }
                 e.preventDefault();
             }, { passive: false });
             
             canvasElement.addEventListener('touchend', function(e) {
+                // For sketch 10, allow touch end events to proceed
+                if (currentSketch === 10) {
+                    return;
+                }
                 e.preventDefault();
             }, { passive: false });
             
