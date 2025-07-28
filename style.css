@@ -17,8 +17,6 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overscroll-behavior: none; /* Prevent pull-to-refresh */
-    -webkit-overflow-scrolling: touch;
 }
 
 /* Main content wrapper */
@@ -71,10 +69,6 @@ h1:hover span {
     margin: 20px auto;
     display: inline-block;
     border-radius: 2px;
-    touch-action: none; /* Prevent touch scrolling */
-    -webkit-touch-callout: none; /* Disable iOS callout */
-    -webkit-user-select: none; /* Disable text selection */
-    user-select: none;
 }
 
 #sketchInfo {
@@ -178,10 +172,6 @@ canvas {
     display: block;
     max-width: 100%;
     height: auto;
-    touch-action: none;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
 }
 
 /* Fullscreen canvas area */
