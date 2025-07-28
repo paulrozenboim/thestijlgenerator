@@ -31,15 +31,18 @@ function createShapeTrail() {
         rotation: 0, // Current rotation angle
         rotationSpeed: map(mouseVelocity, 0, 50, 0.02, 0.3), // Rotation speed based on drag speed
         direction: random([-1, 1]) // Random clockwise or counterclockwise
-        for (let other of shapes) {
-            let d = dist(shape.x, shape.y, other.x, other.y);
-            if (d < (shape.size + other.size) / 2) {
-                let angle = atan2(shape.y - other.y, shape.x - other.x);
-                shape.x += cos(angle) * 20;
-                shape.y += sin(angle) * 20;
-            }
+    }; // <- Added missing closing brace
+    
+    // Collision avoidance logic (moved outside object creation)
+    for (let other of shapes) {
+        let d = dist(shape.x, shape.y, other.x, other.y);
+        if (d < (shape.size + other.size) / 2) {
+            let angle = atan2(shape.y - other.y, shape.x - other.x);
+            shape.x += cos(angle) * 20;
+            shape.y += sin(angle) * 20;
         }
-    };
+    }
+    
     shapes.push(shape);
 }
 
