@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Stilj Generator</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="shortcut icon" href="images/favicon.ico">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -34,17 +40,22 @@
         </div>
 
         <div id="sketchInfo">
-            <div id="sketchTitle">Basic Shape Drawing</div>
-            <div id="sketchDescription">Click to draw basic shapes with Mondrian colors</div>
-        </div>
+             <!-- <div id="sketchTitle">Basic Shape Drawing</div> -->
+                <div id="sketchDescription">Click to draw basic shapes with Mondrian colors</div>
+            </div>
 
         <div id="canvasArea">
             <!-- p5.js canvas goes here -->
         </div>
     </div>
 
+
+
+
+
     <footer>
-        <div><a href="http://www.unapaulogetic.art/">by @unapaulogetic</a></div>
+        <div class="footer-item"><a href="http://www.unapaulogetic.art/" target="_blank">by @unapaulogetic</a></div>
+        <div class="footer-item"><a href="https://www.buymeacoffee.com/unapaulogetic" target="_blank">☕ Buy me a Coffee</a></div>
     </footer>
 
     <script src="lib/p5.js"></script>
@@ -268,34 +279,21 @@
             }
         }
 
-        // Keyboard functionality - Save with 'S' key, Clear with 'E', Fullscreen with 'F'
+        // Keyboard functionality - Save with 'S' key
         document.addEventListener('keydown', function(event) {
-            // Check if keys are pressed (case insensitive) without modifiers
-            if (!event.ctrlKey && !event.metaKey && !event.altKey) {
-                switch(event.key.toLowerCase()) {
-                    case 's':
-                        // Save canvas image
-                        event.preventDefault();
-                        saveCanvasImage();
-                        console.log("Screenshot saved!");
-                        showSaveConfirmation();
-                        break;
-                    
-                    case 'e':
-                        // Clear/Erase canvas
-                        event.preventDefault();
-                        clearCanvas();
-                        console.log("Canvas cleared!");
-                        showClearConfirmation();
-                        break;
-                    
-                    case 'f':
-                        // Toggle fullscreen
-                        event.preventDefault();
-                        toggleFullscreen();
-                        console.log("Fullscreen toggled!");
-                        break;
-                }
+            // Check if 'S' key is pressed (case insensitive)
+            if (event.key.toLowerCase() === 's' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+                // Prevent default browser behavior
+                event.preventDefault();
+                
+                // Save canvas image
+                saveCanvasImage();
+                
+                // Visual feedback
+                console.log("Screenshot saved!");
+                
+                // Optional: Show brief visual confirmation
+                showSaveConfirmation();
             }
         });
 
@@ -317,36 +315,7 @@
                 z-index: 1000;
                 animation: fadeInOut 2s ease-in-out;
             `;
-        
-                    // Show clear confirmation
-        function showClearConfirmation() {
-            // Create temporary notification
-            const notification = document.createElement('div');
-            notification.textContent = '🧽 Canvas Cleared!';
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #018C34;
-                color: #fff;
-                padding: 10px 20px;
-                border-radius: 5px;
-                font-family: Verdana, sans-serif;
-                font-weight: bold;
-                z-index: 1000;
-                animation: fadeInOut 2s ease-in-out;
-            `;
             
-            document.body.appendChild(notification);
-            
-            // Remove notification after animation
-            setTimeout(() => {
-                if (document.body.contains(notification)) {
-                    document.body.removeChild(notification);
-                }
-            }, 2000);
-        }
-
             // Add CSS animation
             const style = document.createElement('style');
             style.textContent = `
@@ -440,7 +409,7 @@
             currentSketch = parseInt(document.getElementById('sketchSelect').value);
             
             let data = sketchData[currentSketch];
-            document.getElementById('sketchTitle').textContent = data.title;
+       //     document.getElementById('sketchTitle').textContent = data.title;
             document.getElementById('sketchDescription').textContent = data.description;
             
             background("#FFFFFF");
@@ -464,14 +433,6 @@
             background("#FFFFFF");
             letters = []; shapes = []; lettersList = [];
             startX = 0; startY = 0; isDrawing = false;
-            
-            // Clear sketch-specific data
-            if (currentSketch === 7 && typeof clearSketch7 === 'function') {
-                clearSketch7();
-            }
-            if (currentSketch === 8 && typeof clearSketch8 === 'function') {
-                clearSketch8();
-            }
         }
 
         function saveCanvasImage() {
