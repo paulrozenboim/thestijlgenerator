@@ -161,12 +161,32 @@ footer {
     font-size: 12px;
     width: 100%;
     flex-shrink: 0;
+    gap: 0;
+}
+
+footer .footer-item {
+    display: inline-block;
+    padding: 0 15px;
+    position: relative;
+}
+
+/* Add vertical line separator */
+footer .footer-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 20px;
+    background: #333;
 }
 
 footer a {
     color: white;
     text-decoration: none;
     transition: color 0.2s ease;
+    padding: 5px 0;
 }
 
 footer a:hover {
